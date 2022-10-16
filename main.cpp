@@ -315,14 +315,14 @@ int main() {
 
     cout << endl;
 
-//   Zero
+//   Zero(AKA +1.0E0)
     Digit_with_floating_point zero(CHAR_BITS, MENTISSA_BITS);
     zero.set_mantissa_bits("0000000000");
 
     zero.set_characteristic_bits("0000");
     zero.set_sign_bit(0);
     zero.set_implicit_bit(0);
-    zero.set_description("Zero");
+    zero.set_description("+1.0E0");
     zero.print_info();
 
 //    +inf
