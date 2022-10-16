@@ -292,22 +292,22 @@ void print_headlines() {
 int main() {
     print_headlines();
 
-// максимального можливо числа для даного діапазону, обраховуємо за формулою < (1-Power[2,-10])*Power[2,4] >
+// максимального можливо числа для даного діапазону, обраховуємо за формулою < (1-Power[2,-11])*Power[2,4] >
     Digit_with_floating_point max_possible(CHAR_BITS, MENTISSA_BITS);
-    max_possible.load_float(15.984375);
-    max_possible.set_description("Maximal possible digit for given range (15.984375)");
+    max_possible.load_float(15.9921875);
+    max_possible.set_description("Maximal possible digit for given range (15.9921875)");
     max_possible.print_info();
 
 
 
 
-//  мінімального числа для даного діапазону, обраховуємо за формулою < -(1-Power[2,-10])*Power[2,4] >
+//  мінімального числа для даного діапазону, обраховуємо за формулою < -(1-Power[2,-11])*Power[2,4] >
     Digit_with_floating_point min_possible(CHAR_BITS, MENTISSA_BITS);
-    min_possible.load_float(-15.984375);
-    min_possible.set_description("Minimal possible digit for given range (-15.984375)");
+    min_possible.load_float(-15.9921875);
+    min_possible.set_description("Minimal possible digit for given range (-15.9921875)");
     min_possible.print_info();
 
-//  мінімального по модулю числа для даного діапазону, обраховуємо за формулою Divide[1,2]*(Power[2,-4+1])
+//  мінімального по модулю числа для даного діапазону, обраховуємо за формулою  < Divide[1,2]*(Power[2,-4+1]) >
     Digit_with_floating_point min_non_zero_modulo(CHAR_BITS, MENTISSA_BITS);
     min_non_zero_modulo.load_float(0.0625);
     min_non_zero_modulo.set_description("Minimal  non-zero number modulo for the given range (0.0625)");
