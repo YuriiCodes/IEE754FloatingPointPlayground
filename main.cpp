@@ -4,14 +4,11 @@
 
 using namespace std;
 const string SEPARATOR = "  ";
+const int CHAR_BITS = 4;
+const int MENTISSA_BITS = 10;
 
 
-// Характеристика 4 біти, мантиса - 10 бітів
-// 2^8 = 256,  0...255,  127 in the middle => we add 127 to the "real" exponent to cover the case when the exponent is negative
-// 2^7 -1
-
-
-// 2^4 =  16 ,  0....15,    7 in the middle => we add   7 to the "real" exponent to cover the case when the exponent is negative
+//  Характеристика 4 біти, мантиса - 10 бітів
 
 class Digit_with_floating_point {
 private:
@@ -123,6 +120,7 @@ public:
         return result;
     }
 
+    // This function calculates shift - the number of digits we have to shift to achieve normalised form. e.g: 111.01 = 1.1101 * 10^2 => the shift here is 2.
     int calculate_shift(string overall_form) {
         int index_of_a_dot = overall_form.find('.');
         if (index_of_a_dot == -1) {
@@ -190,7 +188,7 @@ public:
         return overall_form;
     }
 
-    //  A helper method that transofrms input like '1101' to '1101000000', so that we can set these bits as mentissa bits
+    //  A helper method that transforms input like '1101' to '1101000000', so that we can set these bits as mantissa bits
     string add_missing_zeroes(string str_to_add_zeroes_to, int length_of_output) {
         string res(length_of_output, '0');
         for (int i = 0; i < str_to_add_zeroes_to.length(); i++) {
@@ -272,10 +270,12 @@ public:
     }
 };
 
-const int CHAR_BITS = 4;
-const int MENTISSA_BITS = 10;
 
+// a helper function to print headlines for easier demonstration of digits with floating points.
 void print_headlines() {
+    cout << "According to the task given, there are 4 bits for  characteristic, and 10 bits for mantissa. The output below will demonstrate special values" << endl
+    << "Where 's' is a sign bit, 'h' are exponent bits, 'n' is an implicit bit, and 'm' are for mantissa bits." << endl;
+
     cout << 's' << SEPARATOR;
 
     for (int i = 0; i < CHAR_BITS; i++) {
@@ -307,11 +307,13 @@ int main() {
     min_possible.set_description("Minimal possible digit for given range (-15.984375)");
     min_possible.print_info();
 
-//  мінімального по модулю числа для даного діапазону користуємося формулами
-    Digit_with_floating_point min_possible_by_abs(CHAR_BITS, MENTISSA_BITS);
-    min_possible_by_abs.set_description("Minimal possible digit by abs for the given range (0.0625)");
-    min_possible_by_abs.load_float(0.0625);
-    min_possible_by_abs.print_info();
+//  мінімального по модулю числа для даного діапазону, обраховуємо за формулою Divide[1,2]*(Power[2,-4+1])
+    Digit_with_floating_point min_non_zero_modulo(CHAR_BITS, MENTISSA_BITS);
+    min_non_zero_modulo.load_float(0.0625);
+    min_non_zero_modulo.set_description("Minimal  non-zero number modulo for the given range (0.0625)");
+    min_non_zero_modulo.print_info();
+
+    cout << endl;
 
 //   Zero
     Digit_with_floating_point zero(CHAR_BITS, MENTISSA_BITS);
@@ -357,9 +359,15 @@ int main() {
     not_normalised.set_mantissa_bits("0000000001");
     not_normalised.print_info();
 
+
+
+    // Get input from user and convert it to floating point digit.
     Digit_with_floating_point test(CHAR_BITS, MENTISSA_BITS);
-    test.load_float(9.125);
+    float user_inp = 0;
+    cout << "Please, enter digit in the following format: [- OR +][WHOLE_PART].[FLOATING PART], e.g. -1.23: ";
+    cin >> user_inp;
+    test.load_float(user_inp);
     test.print_info();
-    
+
     return 0;
 }
