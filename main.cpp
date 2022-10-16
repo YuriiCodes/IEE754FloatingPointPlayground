@@ -11,7 +11,7 @@ const string SEPARATOR = "  ";
 // 2^7 -1
 
 
-// 2^4 =  16,  0....15,    7 in the middle => we add   7 to the "real" exponent to cover the case when the exponent is negative
+// 2^4 =  16 ,  0....15,    7 in the middle => we add   7 to the "real" exponent to cover the case when the exponent is negative
 
 class Digit_with_floating_point {
 private:
@@ -193,7 +193,7 @@ public:
     //  A helper method that transofrms input like '1101' to '1101000000', so that we can set these bits as mentissa bits
     string add_missing_zeroes(string str_to_add_zeroes_to, int length_of_output) {
         string res(length_of_output, '0');
-        for(int i = 0; i < str_to_add_zeroes_to.length(); i++){
+        for (int i = 0; i < str_to_add_zeroes_to.length(); i++) {
             res[i] = str_to_add_zeroes_to[i];
         }
         return res;
@@ -202,54 +202,73 @@ public:
     // Suppose normalised form is '1.1101'. We need to take only '1101' part, and this cycle does exactly this
     string parse_mentissa_part(string normalised_form) {
         string res = "";
-        for(int i = 0; i < normalised_form.length() - 2; i++) {
-            res += normalised_form[i+2];
+        for (int i = 0; i < normalised_form.length() - 2; i++) {
+            res += normalised_form[i + 2];
         }
         return res;
     }
 
 //    A method that takes in a string, like 7.025, splits it to integer part of 7 and float part of 0.25. It then converts 7 to base 2.
     void load_float(float float_to_load) {
-        cout << "loading " << float_to_load << endl;
+        set_description((to_string(float_to_load)));
+//        cout << "loading " << float_to_load << endl;
         int int_part = (int) float_to_load;
-        cout << "integer part: " << int_part << endl;
+
+//        cout << "Setting sign bit" << endl;
+        if (float_to_load < 0) {
+            set_sign_bit(1);
+//            cout << "Sign bit set to 1, because float is < 0" << endl;
+        } else {
+            set_sign_bit(0);
+//            cout << "Sign bit set to 0, because float is > 0" << endl;
+        }
+
+//        cout << "integer part: " << int_part << endl;
 
         string int_part_in_binary = to_binary(int_part);
-        cout << "integer part in binary: " << int_part_in_binary << endl;
+//        cout << "integer part in binary: " << int_part_in_binary << endl;
 
 
         float float_part = (float) (float_to_load - int_part);
-        cout << "float part:" << float_part << endl;
+//        cout << "float part:" << float_part << endl;
 
         // The input to floating_part_to_binary must be < 1, therefore if the float_to_load is 7.25, we need to pass 0.25 to floating_part_to_binary in order, to get the correct output
         string float_part_in_binary = floating_part_to_binary(float_to_load - (int) float_to_load);
-        cout << "floating part in binary: " << float_part_in_binary << endl;
+//        cout << "floating part in binary: " << float_part_in_binary << endl;
 
-        non_normalised_form =  int_part_in_binary + "." + float_part_in_binary;
-        cout << "Overall non-normalised digit: " << non_normalised_form << endl;
+        non_normalised_form = int_part_in_binary + "." + float_part_in_binary;
+//        cout << "Overall non-normalised digit: " << non_normalised_form << endl;
 
         normalised_form = calculate_normalised_form(non_normalised_form);
-        shift  = calculate_shift(non_normalised_form);
-        cout << "Overall normalised form: " << normalised_form << endl;
-        cout << "Shift:" << shift << endl;
+        shift = calculate_shift(non_normalised_form);
+//        cout << "Overall normalised form: " << normalised_form << endl;
+//        cout << "Shift:" << shift << endl;
 
-//        int exponent_bias = 2(num_of_characteristic_bits-1) -1;
-        int exponent_bias = pow(2, num_of_characteristic_bits -1) - 1;
-        cout << "exponent bias:" << exponent_bias << endl;
+
+        int exponent_bias = pow(2, num_of_characteristic_bits - 1) - 1;
+//        cout << "exponent bias:" << exponent_bias << endl;
 
         int exponent = shift + exponent_bias;
-        cout << "Exponent: " << exponent << endl;
+//        cout << "Exponent: " << exponent << endl;
 
         string exponent_in_binary = to_binary(exponent);
         set_characteristic_bits(exponent_in_binary);
-        cout << "Exponent in binary: " << exponent_in_binary << endl;
+//        cout << "Exponent in binary: " << exponent_in_binary << endl;
 
         string mantissa_bits = parse_mentissa_part(normalised_form);
+
         mantissa_bits = add_missing_zeroes(mantissa_bits, num_of_mantissa_bits);
-        cout << "A string that we need to add 0s to: " << mantissa_bits << endl;
-
-
+//        cout << "A string that we need to add 0s to: " << mantissa_bits << endl;
         set_mantissa_bits(mantissa_bits);
+
+//        cout << "Setting implicit bit" << endl;
+        if (exponent_in_binary.find("1") != string::npos) {
+//            cout << "There is a one in exponent(характеристика) => we are setting implicit bit to 1." << endl;
+            set_implicit_bit(1);
+        } else {
+//            cout << "There are only zeroes in exponent(характеристика) => we are setting implicit bit to 0." << endl;
+            set_implicit_bit(0);
+        }
     }
 };
 
@@ -271,41 +290,76 @@ void print_headlines() {
 }
 
 int main() {
-////   Zero
-//    Digit_with_floating_point zero(CHAR_BITS, MENTISSA_BITS);
-//    zero.set_mantissa_bits("0000000000");
-//
-//    zero.set_characteristic_bits("0000");
-//    zero.set_sign_bit(0);
-//    zero.set_implicit_bit(0);
-//    zero.set_description("Zero");
-//
-////    +inf
-//    Digit_with_floating_point positive_infinity(CHAR_BITS, MENTISSA_BITS);
-//    positive_infinity.set_characteristic_bits("1111");
-//    positive_infinity.set_mantissa_bits("0000000000");
-//    positive_infinity.set_sign_bit(0);
-//    positive_infinity.set_description("+ Inf");
-//
-////    -inf
-//    Digit_with_floating_point negative_infinity(CHAR_BITS, MENTISSA_BITS);
-//    negative_infinity.set_characteristic_bits("1111");
-//    negative_infinity.set_mantissa_bits("0000000000");
-//    negative_infinity.set_sign_bit(1);
-//    negative_infinity.set_description("- Inf");
-//
-////
-//    print_headlines();
-//    zero.print_info();
-//    positive_infinity.print_info();
-//    negative_infinity.print_info();
+    print_headlines();
+
+// максимального можливо числа для даного діапазону, обраховуємо за формулою < (1-Power[2,-10])*Power[2,4] >
+    Digit_with_floating_point max_possible(CHAR_BITS, MENTISSA_BITS);
+    max_possible.load_float(15.984375);
+    max_possible.set_description("Maximal possible digit for given range (15.984375)");
+    max_possible.print_info();
+
+
+
+
+//  мінімального числа для даного діапазону, обраховуємо за формулою < -(1-Power[2,-10])*Power[2,4] >
+    Digit_with_floating_point min_possible(CHAR_BITS, MENTISSA_BITS);
+    min_possible.load_float(-15.984375);
+    min_possible.set_description("Minimal possible digit for given range (-15.984375)");
+    min_possible.print_info();
+
+//  мінімального по модулю числа для даного діапазону користуємося формулами
+    Digit_with_floating_point min_possible_by_abs(CHAR_BITS, MENTISSA_BITS);
+    min_possible_by_abs.set_description("Minimal possible digit by abs for the given range (0.0625)");
+    min_possible_by_abs.load_float(0.0625);
+    min_possible_by_abs.print_info();
+
+//   Zero
+    Digit_with_floating_point zero(CHAR_BITS, MENTISSA_BITS);
+    zero.set_mantissa_bits("0000000000");
+
+    zero.set_characteristic_bits("0000");
+    zero.set_sign_bit(0);
+    zero.set_implicit_bit(0);
+    zero.set_description("Zero");
+    zero.print_info();
+
+//    +inf
+    Digit_with_floating_point positive_infinity(CHAR_BITS, MENTISSA_BITS);
+    positive_infinity.set_characteristic_bits("1111");
+    positive_infinity.set_mantissa_bits("0000000000");
+    positive_infinity.set_sign_bit(0);
+    positive_infinity.set_description("+ Inf");
+    positive_infinity.print_info();
+
+//    -inf
+    Digit_with_floating_point negative_infinity(CHAR_BITS, MENTISSA_BITS);
+    negative_infinity.set_characteristic_bits("1111");
+    negative_infinity.set_mantissa_bits("0000000000");
+    negative_infinity.set_sign_bit(1);
+    negative_infinity.set_description("- Inf");
+    negative_infinity.print_info();
+
+//    NaN
+    Digit_with_floating_point not_a_number(CHAR_BITS, MENTISSA_BITS);
+    not_a_number.set_sign_bit(1);
+    not_a_number.set_characteristic_bits("1111");
+    not_a_number.set_implicit_bit(1);
+    not_a_number.set_mantissa_bits("0000011110");
+    not_a_number.set_description("NaN value");
+    not_a_number.print_info();
+
+//    Not normalised
+    Digit_with_floating_point not_normalised(CHAR_BITS, MENTISSA_BITS);
+    not_normalised.set_characteristic_bits("0000");
+    not_normalised.set_implicit_bit(1);
+    not_normalised.set_sign_bit(0);
+    not_normalised.set_description("Not normalised");
+    not_normalised.set_mantissa_bits("0000000001");
+    not_normalised.print_info();
 
     Digit_with_floating_point test(CHAR_BITS, MENTISSA_BITS);
-    test.load_float(7.25);
+    test.load_float(9.125);
     test.print_info();
-
-//TODO: 1. review 'load_float' method.
-// 2. Add the implicit bit setter
-// 3. Add the factory of digits and special values, inherited from it.
+    
     return 0;
 }
